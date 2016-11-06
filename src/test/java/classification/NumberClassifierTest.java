@@ -1,6 +1,7 @@
 package classification;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -31,8 +32,7 @@ public class NumberClassifierTest {
     @Test
     public void factorsOf_1의_인수목록은_1이다() throws Exception {
         // given
-        List<Integer> expected = new ArrayList<>();
-        expected.add(1);
+        List<Integer> expected = Arrays.asList(1);
 
         // when
         List<Integer> result = NumberClassifier.factorsOf(1);
@@ -44,11 +44,7 @@ public class NumberClassifierTest {
     @Test
     public void factorsOf_6의_인수목록은_1236이다() throws Exception {
         // given
-        List<Integer> expected = new ArrayList<>();
-        expected.add(1);
-        expected.add(2);
-        expected.add(3);
-        expected.add(6);
+        List<Integer> expected = Arrays.asList(1, 2, 3, 6);
 
         // when
         List<Integer> result = NumberClassifier.factorsOf(6);
@@ -60,9 +56,7 @@ public class NumberClassifierTest {
     @Test
     public void factorsOf_13의_인수목록은_1과_13이다() throws Exception {
         // given
-        List<Integer> expected = new ArrayList<>();
-        expected.add(1);
-        expected.add(13);
+        List<Integer> expected = Arrays.asList(1, 13);
 
         // when
         List<Integer> result = NumberClassifier.factorsOf(13);
