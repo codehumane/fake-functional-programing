@@ -1,5 +1,7 @@
 package structure;
 
+import java.util.function.Function;
+
 public class Tree {
 
     /**
@@ -8,18 +10,12 @@ public class Tree {
      * @return
      */
     public static final int depth(Node node) {
-        Either<Empty, Either<LeafNode, InternalNode>> either = node.toEither();
-        if (either.hasLeft()) {
-            return 0;
-        } else {
-            Either<LeafNode, InternalNode> right = either.right();
-            if (right.hasLeft()) {
-                return 1;
-            } else {
-                InternalNode internal = right.right();
-                return Math.max(depth(internal.left), depth(internal.right)) + 1;
-            }
-        }
+        return processEither(
+                node,
+                empty -> 0,
+                leaf -> 1,
+                x -> Math.max(depth(x.left), depth(x.right)) + 1
+        );
     }
 
     /**
@@ -29,18 +25,12 @@ public class Tree {
      * @return
      */
     public static final boolean contains(Node node, int value) {
-        Either<Empty, Either<LeafNode, InternalNode>> either = node.toEither();
-        if (either.hasLeft()) {
-            return false;
-        } else {
-            Either<LeafNode, InternalNode> right = either.right();
-            if (right.hasLeft()) {
-                return right.left().value == value;
-            } else {
-                return contains(right.right().left, value)
-                        || contains(right.right().right, value);
-            }
-        }
+        return processEither(
+                node,
+                x -> false,
+                x -> x.value == value,
+                x -> contains(x.left, value) || contains(x.right, value)
+        );
     }
 
     /**
@@ -49,16 +39,33 @@ public class Tree {
      * @return
      */
     public static final int occurrence(Node node, int value) {
+        return processEither(
+                node,
+                x -> 0,
+                x -> (x.value == value) ? 1 : 0,
+                x -> occurrence(x.left, value) + occurrence(x.right, value)
+        );
+    }
+
+    private static final <T> T processEither(Node node, Function<Empty, T> onEmpty,
+            Function<LeafNode, T> onLeaf, Function<InternalNode, T> onInternal) {
+
         Either<Empty, Either<LeafNode, InternalNode>> either = node.toEither();
         if (either.hasLeft()) {
-            return 0;
+
+            // empty
+            return onEmpty.apply(either.left());
         } else {
+
             Either<LeafNode, InternalNode> right = either.right();
             if (right.hasLeft()) {
-                return (right.left().value == value) ? 1 : 0;
+
+                // leaf
+                return onLeaf.apply(right.left());
             } else {
-                return occurrence(right.right().left, value) +
-                        occurrence(right.right().right, value);
+
+                // internal
+                return onInternal.apply(right.right());
             }
         }
     }
