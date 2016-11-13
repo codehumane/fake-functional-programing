@@ -11,7 +11,7 @@ public class Tree {
      */
     public static final int depth(Node node) {
         return processEither(
-                node,
+                node.toEither(),
                 empty -> 0,
                 leaf -> 1,
                 x -> Math.max(depth(x.left), depth(x.right)) + 1
@@ -26,7 +26,7 @@ public class Tree {
      */
     public static final boolean contains(Node node, int value) {
         return processEither(
-                node,
+                node.toEither(),
                 x -> false,
                 x -> x.value == value,
                 x -> contains(x.left, value) || contains(x.right, value)
@@ -40,17 +40,27 @@ public class Tree {
      */
     public static final int occurrence(Node node, int value) {
         return processEither(
-                node,
+                node.toEither(),
                 x -> 0,
                 x -> (x.value == value) ? 1 : 0,
                 x -> occurrence(x.left, value) + occurrence(x.right, value)
         );
     }
 
-    private static final <T> T processEither(Node node, Function<Empty, T> onEmpty,
-            Function<LeafNode, T> onLeaf, Function<InternalNode, T> onInternal) {
+    /**
+     * Either<Empty, Either<LeafNode, InternalNode>>의 공통된 처리 흐름을 담당한다.
+     * @param either
+     * @param onEmpty either가 {@link Empty} 값을 가지는 경우의 처리
+     * @param onLeaf either가 {@link LeafNode} 값을 가지는 경우의 처리
+     * @param onInternal either가 {@link InternalNode} 의 값을 가지는 경우의 처리
+     * @param <T> 각 함수의 공통 반환 값
+     * @return
+     */
+    private static final <T> T processEither(
+            Either<Empty, Either<LeafNode, InternalNode>> either,
+            Function<Empty, T> onEmpty, Function<LeafNode, T> onLeaf,
+            Function<InternalNode, T> onInternal) {
 
-        Either<Empty, Either<LeafNode, InternalNode>> either = node.toEither();
         if (either.hasLeft()) {
 
             // empty
